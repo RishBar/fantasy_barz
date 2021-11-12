@@ -21,7 +21,7 @@ const YahooFantasy = require('yahoo-fantasy');
 app.yf = new YahooFantasy(
     process.env.YaAPP_KEY,
     process.env.YaAPP_SECRET,
-    null,
+    "https://fantasybarz-production.up.railway.app/auth/yahoo/callback",
     null
 );
 
