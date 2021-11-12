@@ -22,8 +22,8 @@ let buddy;
 app.yf = new YahooFantasy(
     process.env.YaAPP_KEY,
     process.env.YaAPP_SECRET,
-    "https://fantasybarz-production.up.railway.app/auth/yahoo/callback",
-    null
+    null,
+    "https://fantasybarz-production.up.railway.app/auth/yahoo/callback"
 );
 
 app.get(
