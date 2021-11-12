@@ -18,6 +18,7 @@ const YahooFantasy = require('yahoo-fantasy');
 //     });
 //   };
 
+let buddy;
 app.yf = new YahooFantasy(
     process.env.YaAPP_KEY,
     process.env.YaAPP_SECRET,
@@ -25,29 +26,32 @@ app.yf = new YahooFantasy(
     null
 );
 
-  app.get(
-    "/auth/yahoo",
-    (req, res) => {
-      app.yf.auth(res);
+app.get(
+  "/auth/yahoo",
+  (req, res) => {
+    app.yf.auth(res);
+  }
+);
+  
+app.get("/auth/yahoo/callback", (req, res) => {
+  console.log("callback route been hit");
+  app.yf.authCallback(req, (err) => {
+    if (err) {
+      return res.redirect("/error");
     }
-  );
-  
-  app.get("/auth/yahoo/callback", (req, res) => {
-    console.log("callback route been hit");
-    
-    app.yf.authCallback(req, (err) => {
-      if (err) {
-        return res.redirect("/error");
-      }
-  
-      return res.redirect("/");
-    });
+    return res.redirect("/");
   });
+  console.log(app.yf);
+});
 
-  app.get("/", (req, res) => {
-    console.log("homepage has been hit");
+app.get("/", (req, res) => {
+  console.log("homepage has been hit");
     
-    res.send("Hello World!"); 
+  res.send("Hello World!"); 
+})
+
+app.get("/error", (req, res) => {
+  res.send("ERROR!"); 
 })
   
 
