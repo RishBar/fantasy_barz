@@ -45,8 +45,6 @@ app.get("/auth/yahoo/callback", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  console.log("homepage has been hit");
-    
   res.send("Hello World!"); 
 })
 
