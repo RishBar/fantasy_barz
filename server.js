@@ -42,6 +42,7 @@ app.get("/auth/yahoo/callback", (req, res) => {
     return res.redirect("/");
   });
   console.log(app.yf);
+  console.log("USERUSERUSERUSERUSERUSER",app.yf.user);
 });
 
 app.get("/", (req, res) => {
