@@ -1,8 +1,12 @@
 const express  = require("express");
-const app = express(); 
-const port = 3000;
+const bodyParser = require('body-parser');
+const cors = require('cors');
 require('dotenv').config()
 const YahooFantasy = require('yahoo-fantasy');
+
+
+const app = express(); 
+const port = process.env.PORT || 3001;
 
 // app.tokenCallback = function ({ access_token, refresh_token }) {
 //     return new Promise((resolve, reject) => {
@@ -18,7 +22,6 @@ const YahooFantasy = require('yahoo-fantasy');
 //     });
 //   };
 
-let buddy;
 app.yf = new YahooFantasy(
     process.env.YaAPP_KEY,
     process.env.YaAPP_SECRET,
@@ -26,12 +29,36 @@ app.yf = new YahooFantasy(
     "https://fantasybarz-production.up.railway.app/auth/yahoo/callback"
 );
 
+app.use((req, res, next) => {
+  console.log(`Request_Endpoint: ${req.method} ${req.url}`);
+  next();
+});
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+app.use(cors());
+
+const api = require('./routes/routes');
+app.use('/api/v1/', api);
+
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+  app.use(express.static(path.join(__dirname, 'client/build')));
+
+  app.get('*', function (req, res) {
+      res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+  });
+};
+
 app.get(
   "/auth/yahoo",
   (req, res) => {
     app.yf.auth(res);
   }
 );
+
   
 app.get("/auth/yahoo/callback", (req, res) => {
   console.log("callback route been hit");
@@ -45,15 +72,10 @@ app.get("/auth/yahoo/callback", (req, res) => {
   console.log("USERUSERUSERUSERUSERUSER",app.yf.user);
 });
 
-app.get("/", (req, res) => {
-  res.send("Hello World!"); 
-})
-
 app.get("/error", (req, res) => {
   res.send("ERROR!"); 
 })
   
-
 app.listen(port, function (){
   console.log("Server running");
 });
