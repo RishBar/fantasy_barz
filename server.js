@@ -7,6 +7,10 @@ const YahooFantasy = require('yahoo-fantasy');
 const redis = require('redis');
 const client = redis.createClient();
 
+client.on('connect', function() {
+  console.log('REDIS Connected!');
+});
+
 
 const app = express(); 
 const port = process.env.PORT || 3001;
@@ -55,10 +59,6 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
       res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
   });
 };
-
-client.on('connect', function() {
-  console.log('REDIS Connected!');
-});
 
 app.get(
   "/auth/yahoo",
