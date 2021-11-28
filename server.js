@@ -6,10 +6,17 @@ const path = require('path');
 const YahooFantasy = require('yahoo-fantasy');
 const redis = require('redis');
 
+var redisPort = process.env.REDISPORT || 6379;
+var redisHost = process.env.REDISHOST || '127.0.0.1';
+var redisAuth = process.env.REDISPASSWORD || null;
+
 (async () => {
-  const client = redis.createClient();
+  const client = redis.createClient(redisPort, redisHost, {
+    auth_pass: redisAuth
+  });
   client.on('error', (err) => console.log('Redis Client Error', err));
   await client.connect();
+  console.log(client)
 })();
 
 
