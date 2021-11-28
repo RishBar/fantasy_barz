@@ -5,11 +5,12 @@ require('dotenv').config()
 const path = require('path'); 
 const YahooFantasy = require('yahoo-fantasy');
 const redis = require('redis');
-const client = redis.createClient();
 
-client.on('connect', function() {
-  console.log('REDIS Connected!');
-});
+(async () => {
+  const client = redis.createClient();
+  client.on('error', (err) => console.log('Redis Client Error', err));
+  await client.connect();
+})();
 
 
 const app = express(); 
