@@ -4,30 +4,33 @@ const cors = require('cors');
 require('dotenv').config()
 const path = require('path'); 
 const YahooFantasy = require('yahoo-fantasy');
+const redis = require('redis');
+const client = redis.createClient();
 
 
 const app = express(); 
 const port = process.env.PORT || 3001;
+const redirectURI = process.env.REDIRECTURI || "http://localhost:3001/auth/yahoo/callback"
 
-// app.tokenCallback = function ({ access_token, refresh_token }) {
-//     return new Promise((resolve, reject) => {
-//       // client is redis client
-//       client.set("accessToken", access_token, (err, res) => {
-//         // could probably handle this with a multi... 
-//         // and you know... handle the errors...
-//         // good thing this is only an example!
-//         client.set("accessToken", access_token, (err, res) => {
-//           return resolve();
-//         })
-//       })
-//     });
-//   };
+app.tokenCallback = tokenCallback = function ({ access_token, refresh_token }) {
+    return new Promise((resolve, reject) => {
+      // client is redis client
+      client.set("accessToken", access_token, (err, res) => {
+        // could probably handle this with a multi... 
+        // and you know... handle the errors...
+        // good thing this is only an example!
+        client.set("accessToken", access_token, (err, res) => {
+          return resolve();
+        })
+      })
+    });
+  };
 
 app.yf = new YahooFantasy(
     process.env.YaAPP_KEY,
     process.env.YaAPP_SECRET,
-    null,
-    "https://fantasybarz-production.up.railway.app/auth/yahoo/callback"
+    tokenCallback,
+    redirectURI
 );
 
 app.use((req, res, next) => {
@@ -53,6 +56,10 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
   });
 };
 
+client.on('connect', function() {
+  console.log('REDIS Connected!');
+});
+
 app.get(
   "/auth/yahoo",
   (req, res) => {
@@ -69,7 +76,10 @@ app.get("/auth/yahoo/callback", (req, res) => {
     }
     return res.redirect("/");
   });
-  console.log(app.yf);
+  client.get('framework', function(err, reply) {
+    console.log("AYYYYYYYY FAM", reply);
+  });
+  console.log("APPAPPAPAPPAPPAP", app.yf);
   console.log("USERUSERUSERUSERUSERUSER",app.yf.user);
 });
 
